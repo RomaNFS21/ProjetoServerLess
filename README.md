@@ -79,6 +79,22 @@ sam local invoke -e events/pedido_demorado.json
 
 Para ajustar o timeout, edite `Timeout` em `Globals` no `template.yaml` para 10, rode `sam build` e repita.
 
+## Execução Rápida e Simulação Local
+
+Caso queira validar todos os cenários (cold start vs warm, HTTP com contador e timeout de 3s vs 10s) sem depender de Docker:
+
+```bash
+python executar_testes_locais.py
+```
+
+Para rodar os testes unitários automatizados:
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+> 📹 **Roteiro para Gravação de Vídeo:** Confira o [ROTEIRO_VIDEO.md](ROTEIRO_VIDEO.md) com o roteiro detalhado minuto a minuto para a gravação da entrega.
+
 ---
 
 ## Respostas às Perguntas
@@ -159,18 +175,27 @@ Após aumentar o `Timeout` para **10 segundos** no `template.yaml`, rodar `sam b
 
 ```
 ProjetoServerLess/
-├── template.yaml            # Template SAM com a definição da função e da API
-├── samconfig.toml            # Configuração do SAM CLI
+├── template.yaml                # Template SAM com definição da função e da API
+├── samconfig.toml                # Configuração do SAM CLI
 ├── hello_world/
 │   ├── __init__.py
-│   ├── app.py                # Handler da função Lambda
-│   └── requirements.txt      # Dependências Python
+│   ├── app.py                    # Handler da função Lambda
+│   └── requirements.txt          # Dependências Python
 ├── events/
-│   ├── pedido.json           # Evento de teste padrão (R-001)
-│   └── pedido_demorado.json  # Evento de teste com demorar=true (R-003)
-├── evidencias/               # Capturas de tela dos experimentos
+│   ├── pedido.json               # Evento de teste padrão (R-001)
+│   └── pedido_demorado.json      # Evento de teste com demorar=true (R-003)
+├── tests/
+│   └── test_app.py               # Testes unitários automatizados
+├── evidencias/                   # Prints (.png) e saídas (.txt) dos experimentos
+│   ├── 01-sam-build.png
+│   ├── 02-invoke-evento-duas-vezes.png
+│   ├── 03-http-com-e-sem-warm-containers.png
+│   ├── 04-timeout-erro-e-ajuste.png
+│   ├── 05-validacao-erro-400.png
 │   └── README.md
-└── README.md                 # Este arquivo
+├── executar_testes_locais.py     # Script para demonstração e simulação completa
+├── ROTEIRO_VIDEO.md              # Roteiro de até 3 minutos para a gravação de tela
+└── README.md                     # Este arquivo
 ```
 
 ## Uso de IA
