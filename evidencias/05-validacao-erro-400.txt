@@ -1,0 +1,9 @@
+====== VALIDAÇÃO DO ERRO 400 (requisicaoId ausente) ======
+
+$ curl -X POST http://127.0.0.1:3000/guias -H "Content-Type: application/json" -d '{}'
+{"erro": "requisicaoId obrigatório"}
+
+Status HTTP: 400 Bad Request
+
+OBSERVAÇÃO: A validação no handler funciona corretamente — quando o campo
+requisicaoId não está presente no body, a função retorna 400 com a mensagem de erro.

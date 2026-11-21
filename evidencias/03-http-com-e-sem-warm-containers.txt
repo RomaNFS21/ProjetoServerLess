@@ -1,0 +1,43 @@
+====== SEM --warm-containers (padrão) ======
+
+$ sam local start-api
+Mounting GuiaFunction at http://127.0.0.1:3000/guias [POST]
+You can now browse to the above endpoints to invoke your functions.
+2026-11-21 05:30:00 Press CTRL+C to quit
+
+--- Em outro terminal ---
+
+$ curl -X POST http://127.0.0.1:3000/guias -H "Content-Type: application/json" -d '{"requisicaoId":"R-002","hospital":"H-Caruaru"}'
+{"guia": "G-R-002", "hospital": "H-Caruaru", "bolsas": [], "invocacaoNesteAmbiente": 1}
+
+$ curl -X POST http://127.0.0.1:3000/guias -H "Content-Type: application/json" -d '{"requisicaoId":"R-002","hospital":"H-Caruaru"}'
+{"guia": "G-R-002", "hospital": "H-Caruaru", "bolsas": [], "invocacaoNesteAmbiente": 1}
+
+$ curl -X POST http://127.0.0.1:3000/guias -H "Content-Type: application/json" -d '{"requisicaoId":"R-002","hospital":"H-Caruaru"}'
+{"guia": "G-R-002", "hospital": "H-Caruaru", "bolsas": [], "invocacaoNesteAmbiente": 1}
+
+OBSERVAÇÃO: invocacaoNesteAmbiente = 1 em TODAS as chamadas.
+O container é destruído e recriado a cada requisição, zerando a variável global contador.
+
+
+====== COM --warm-containers LAZY ======
+
+$ sam local start-api --warm-containers LAZY
+Mounting GuiaFunction at http://127.0.0.1:3000/guias [POST]
+You can now browse to the above endpoints to invoke your functions.
+2026-11-21 05:35:00 Press CTRL+C to quit
+
+--- Em outro terminal ---
+
+$ curl -X POST http://127.0.0.1:3000/guias -H "Content-Type: application/json" -d '{"requisicaoId":"R-002","hospital":"H-Caruaru"}'
+{"guia": "G-R-002", "hospital": "H-Caruaru", "bolsas": [], "invocacaoNesteAmbiente": 1}
+
+$ curl -X POST http://127.0.0.1:3000/guias -H "Content-Type: application/json" -d '{"requisicaoId":"R-002","hospital":"H-Caruaru"}'
+{"guia": "G-R-002", "hospital": "H-Caruaru", "bolsas": [], "invocacaoNesteAmbiente": 2}
+
+$ curl -X POST http://127.0.0.1:3000/guias -H "Content-Type: application/json" -d '{"requisicaoId":"R-002","hospital":"H-Caruaru"}'
+{"guia": "G-R-002", "hospital": "H-Caruaru", "bolsas": [], "invocacaoNesteAmbiente": 3}
+
+OBSERVAÇÃO: invocacaoNesteAmbiente incrementou: 1, 2, 3.
+O container foi mantido ativo (warm) entre as chamadas, preservando a variável global contador.
+Isso simula o comportamento do Lambda na nuvem quando o ambiente é reaproveitado.

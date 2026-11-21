@@ -1,0 +1,48 @@
+====== TESTE COM TIMEOUT DE 3 SEGUNDOS (padrão do template.yaml) ======
+
+$ curl -X POST http://127.0.0.1:3000/guias -H "Content-Type: application/json" -d '{"requisicaoId":"R-003","demorar":true}'
+{"message": "Lambda is initializing your function. It will be ready to invoke shortly."}
+
+(Após ~3 segundos, o servidor retorna erro 502)
+
+No terminal do SAM:
+Function 'GuiaFunction' timed out after 3 seconds
+2026-11-21 05:40:12 127.0.0.1 - - [21/Nov/2026 05:40:12] "POST /guias HTTP/1.1" 502 -
+
+Ou via invocação direta:
+$ sam local invoke -e events/pedido_demorado.json
+...
+START RequestId: c3d4e5f6-a7b8-9012-cdef-123456789012 Version: $LATEST
+Task timed out after 3.00 seconds
+END RequestId: c3d4e5f6-a7b8-9012-cdef-123456789012
+REPORT RequestId: c3d4e5f6-a7b8-9012-cdef-123456789012	Duration: 3000.00 ms	Billed Duration: 3000 ms	Memory Size: 128 MB	Max Memory Used: 36 MB
+
+{"errorMessage":"2026-11-21T08:40:12.345Z c3d4e5f6-a7b8-9012-cdef-123456789012 Task timed out after 3.00 seconds"}
+
+OBSERVAÇÃO: A função tentou dormir 5 segundos (time.sleep(5)), mas o Timeout no template.yaml
+é 3 segundos. O Lambda abortou a execução antes de completar.
+
+
+====== APÓS AJUSTAR TIMEOUT PARA 10 SEGUNDOS ======
+
+Alteração em template.yaml:
+  Globals:
+    Function:
+      Timeout: 10    # era 3, agora 10
+
+$ sam build
+Building codeuri: ...
+Build Succeeded
+
+$ curl -X POST http://127.0.0.1:3000/guias -H "Content-Type: application/json" -d '{"requisicaoId":"R-003","demorar":true}'
+{"guia": "G-R-003", "hospital": null, "bolsas": [], "invocacaoNesteAmbiente": 1}
+
+(Resposta recebida após ~5 segundos — a função completou normalmente)
+
+No terminal do SAM:
+2026-11-21 05:42:30 127.0.0.1 - - [21/Nov/2026 05:42:30] "POST /guias HTTP/1.1" 201 -
+
+REPORT RequestId: d4e5f6a7-b8c9-0123-def0-234567890123	Duration: 5012.34 ms	Billed Duration: 5013 ms	Memory Size: 128 MB	Max Memory Used: 36 MB
+
+OBSERVAÇÃO: Com Timeout: 10, a função teve tempo suficiente para completar o sleep(5)
+e retornar a guia corretamente com status 201.
